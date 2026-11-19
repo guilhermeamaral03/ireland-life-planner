@@ -1,0 +1,127 @@
+{
+ "version": "2.0",
+ "class": "dataset",
+ "label": "Recorded crime incidents (New Garda Operating Model)",
+ "updated": "2026-10-01T11:00:00.000Z",
+ "id": [
+  "STATISTIC",
+  "TLIST(A1)",
+  "C03037V05454",
+  "C02480V03003"
+ ],
+ "size": [
+  1,
+  5,
+  3,
+  3
+ ],
+ "dimension": {
+  "STATISTIC": {
+   "label": "Statistic",
+   "category": {
+    "index": [
+     "CJA11C01"
+    ],
+    "label": {
+     "CJA11C01": "Recorded crime incidents"
+    }
+   }
+  },
+  "TLIST(A1)": {
+   "label": "Year",
+   "category": {
+    "index": [
+     "2021",
+     "2022",
+     "2023",
+     "2024",
+     "2025"
+    ],
+    "label": {
+     "2021": "2021",
+     "2022": "2022",
+     "2023": "2023",
+     "2024": "2024",
+     "2025": "2025"
+    }
+   }
+  },
+  "C03037V05454": {
+   "label": "Garda Station",
+   "category": {
+    "index": [
+     "31201",
+     "33108",
+     "11101"
+    ],
+    "label": {
+     "11101": "Bailieboro, Louth/Cavan/Monaghan Division (11101)",
+     "31201": "Ballincollig, Cork City Division (31201)",
+     "33108": "Kinsale, Cork County Division (33108)"
+    }
+   }
+  },
+  "C02480V03003": {
+   "label": "Type of Offence",
+   "category": {
+    "index": [
+     "03",
+     "07",
+     "08"
+    ],
+    "label": {
+     "03": "Attempts/threats to murder, assaults, harassments and related offences (03)",
+     "07": "Burglary and related offences (07)",
+     "08": "Theft and related offences (08)"
+    }
+   }
+  }
+ },
+ "value": [
+  67,
+  5,
+  95,
+  40,
+  10,
+  42,
+  36,
+  2,
+  24,
+  65,
+  16,
+  180,
+  44,
+  4,
+  22,
+  37,
+  7,
+  29,
+  71,
+  10,
+  173,
+  44,
+  null,
+  63,
+  29,
+  5,
+  37,
+  57,
+  12,
+  246,
+  35,
+  6,
+  48,
+  44,
+  13,
+  62,
+  62,
+  12,
+  225,
+  28,
+  2,
+  49,
+  43,
+  10,
+  42
+ ]
+}

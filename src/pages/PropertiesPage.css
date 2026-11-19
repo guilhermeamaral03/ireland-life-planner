@@ -1,0 +1,7 @@
+.prop-sub { margin: -4px 0 0; font-size: 0.88rem; }
+.property-form { display: grid; grid-template-columns: 1fr minmax(280px, 380px); gap: var(--space-4); align-items: start; }
+.property-live { position: sticky; top: var(--space-4); }
+@media (max-width: 1000px) {
+  .property-form { grid-template-columns: 1fr; }
+  .property-live { position: static; }
+}

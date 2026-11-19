@@ -1,0 +1,13 @@
+.dash-status { display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap; color: var(--text-muted); }
+.dash-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-4); }
+.dash-charts .card { margin-bottom: 0; min-width: 0; }
+.chart-sub { margin-top: calc(-1 * var(--space-1)); font-size: 0.85rem; }
+.projection-end { margin-bottom: var(--space-2); }
+.chart-table { margin-top: var(--space-3); font-size: 0.9rem; }
+.chart-table summary { cursor: pointer; color: var(--green-800); }
+.chart-table table { margin-top: var(--space-2); }
+.recharts-wrapper:focus, .recharts-surface:focus { outline: none; }
+
+@media (max-width: 600px) {
+  .dash-charts { grid-template-columns: 1fr; }
+}

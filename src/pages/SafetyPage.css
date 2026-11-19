@@ -1,0 +1,11 @@
+.safety-table td { vertical-align: middle; }
+.safety-table tr.active td { background: var(--green-50); }
+.link-btn { background: none; border: 0; padding: 0; font: inherit; color: var(--green-800); cursor: pointer; text-align: left; text-decoration: underline; }
+.input-sm { min-height: 34px; padding: 4px 8px; font-size: 0.9rem; max-width: 220px; }
+.offence-table tr.chosen td:first-child { font-weight: 600; }
+.criteria-summary { cursor: pointer; font-weight: 600; font-size: 1.1rem; }
+.criteria-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: var(--space-1) var(--space-4); margin-bottom: var(--space-4); }
+@media (max-width: 600px) {
+  .input-sm { max-width: 112px; }
+  .safety-table .show-sm { margin-top: 4px; }
+}

@@ -1,0 +1,68 @@
+{
+  "year": 2026,
+  "status": "oficial",
+  "statusNote": "Regras oficiais em vigor para 2026.",
+  "notes": [
+    "PRSI classe A subiu de 4,2% para 4,35% em 1º de outubro de 2026; o cálculo anual divide o ano entre as duas alíquotas."
+  ],
+  "incomeTax": {
+    "standardRate": { "value": 0.2, "status": "oficial", "source": "https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/tax-relief-charts/index.aspx" },
+    "higherRate": { "value": 0.4, "status": "oficial", "source": "https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/tax-relief-charts/index.aspx" },
+    "bands": {
+      "solteiro": { "value": 44000, "status": "oficial", "source": "https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/tax-relief-charts/index.aspx" },
+      "pai_mae_solteiro": { "value": 48000, "status": "oficial", "source": "https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/tax-relief-charts/index.aspx" },
+      "casado_uma_renda": { "value": 53000, "status": "oficial", "source": "https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/tax-relief-charts/index.aspx" },
+      "casado_duas_rendas_base": { "value": 53000, "status": "oficial", "source": "https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/tax-relief-charts/index.aspx" },
+      "casado_duas_rendas_max_increase": { "value": 35000, "status": "oficial", "source": "https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/tax-relief-charts/index.aspx" }
+    },
+    "credits": {
+      "personal_single": { "value": 2000, "status": "oficial", "source": "https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/tax-relief-charts/index.aspx" },
+      "personal_married": { "value": 4000, "status": "oficial", "source": "https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/tax-relief-charts/index.aspx" },
+      "employee": { "value": 2000, "status": "oficial", "source": "https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/tax-relief-charts/index.aspx" },
+      "spcc": { "value": 1900, "status": "oficial", "source": "https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/tax-relief-charts/index.aspx" },
+      "employee_income_rate": { "value": 0.2, "status": "oficial", "source": "https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/income-and-employment/employee-tax-credit/index.aspx" }
+    },
+    "rentCredit": {
+      "rate": { "value": 0.2, "status": "oficial", "source": "https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/land-and-property/rent-credit/how-much-claim.aspx" },
+      "max_single": { "value": 1000, "status": "oficial", "source": "https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/land-and-property/rent-credit/how-much-claim.aspx" },
+      "max_couple": { "value": 2000, "status": "oficial", "source": "https://www.revenue.ie/en/personal-tax-credits-reliefs-and-exemptions/land-and-property/rent-credit/how-much-claim.aspx" }
+    }
+  },
+  "usc": {
+    "exemption": { "value": 13000, "status": "oficial", "source": "https://www.revenue.ie/en/jobs-and-pensions/usc/calculating-usc.aspx" },
+    "bands": {
+      "value": [
+        { "upTo": 12012, "rate": 0.005 },
+        { "upTo": 28700, "rate": 0.02 },
+        { "upTo": 70044, "rate": 0.03 },
+        { "upTo": null, "rate": 0.08 }
+      ],
+      "status": "oficial",
+      "source": "https://www.revenue.ie/en/jobs-and-pensions/usc/standard-rates-thresholds.aspx"
+    },
+    "reducedIncomeLimit": { "value": 60000, "status": "oficial", "source": "https://www.revenue.ie/en/jobs-and-pensions/usc/reduced-rates.aspx" },
+    "reducedBands": {
+      "value": [
+        { "upTo": 12012, "rate": 0.005 },
+        { "upTo": null, "rate": 0.02 }
+      ],
+      "status": "oficial",
+      "source": "https://www.revenue.ie/en/jobs-and-pensions/usc/reduced-rates.aspx"
+    }
+  },
+  "prsi": {
+    "weeklyExemption": { "value": 352, "status": "oficial", "source": "https://www.citizensinformation.ie/en/social-welfare/irish-social-welfare-system/social-insurance-prsi/paying-social-insurance/" },
+    "creditMax": { "value": 12, "status": "oficial", "source": "https://www.citizensinformation.ie/en/social-welfare/irish-social-welfare-system/social-insurance-prsi/paying-social-insurance/" },
+    "creditTaperFrom": { "value": 352.01, "status": "oficial", "source": "https://www.citizensinformation.ie/en/social-welfare/irish-social-welfare-system/social-insurance-prsi/paying-social-insurance/" },
+    "creditUpTo": { "value": 424, "status": "oficial", "source": "https://www.citizensinformation.ie/en/social-welfare/irish-social-welfare-system/social-insurance-prsi/paying-social-insurance/" },
+    "creditTaperDivisor": { "value": 6, "status": "oficial", "source": "https://www.citizensinformation.ie/en/social-welfare/irish-social-welfare-system/social-insurance-prsi/paying-social-insurance/" },
+    "ratePeriods": {
+      "value": [
+        { "from": "2026-01-01", "rate": 0.042 },
+        { "from": "2026-10-01", "rate": 0.0435 }
+      ],
+      "status": "oficial",
+      "source": "https://www.citizensinformation.ie/en/social-welfare/irish-social-welfare-system/social-insurance-prsi/paying-social-insurance/"
+    }
+  }
+}
