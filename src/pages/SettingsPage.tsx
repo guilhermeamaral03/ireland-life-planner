@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { clearAllData, downloadBackup, importBackup, parseBackup, type BackupFile } from '../db/backup'
 import { getSettings, type TableName } from '../db/db'
+import { ProfileEditor } from '../components/ProfileEditor'
 import { formatDateTime } from '../domain/format'
 
 const TABLE_LABELS: Record<TableName, string> = {
@@ -79,10 +80,12 @@ export function SettingsPage() {
     <div className="page">
       <header className="page-header">
         <h1>Configurações</h1>
-        <p>Seus dados ficam somente neste aparelho.</p>
+        <p>Perfil, backup e dados deste aparelho.</p>
       </header>
 
       {message && <div className={`alert alert-${message.type}`} role="status">{message.text}</div>}
+
+      <ProfileEditor />
 
       <section className="card">
         <h2>Exportar backup</h2>

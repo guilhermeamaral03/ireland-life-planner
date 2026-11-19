@@ -5,6 +5,14 @@
   display: flex; flex-direction: column; padding: var(--space-5) var(--space-3);
   overflow-y: auto; z-index: 20;
 }
+.topbar-brand { display: flex; align-items: center; gap: var(--space-2); }
+.profile-link {
+  display: flex; align-items: center; gap: var(--space-3); margin: 0 var(--space-3) var(--space-5);
+  padding: var(--space-2); border-radius: var(--radius-sm); color: #fff; text-decoration: none;
+  background: rgb(255 255 255 / 0.06);
+}
+.profile-link:hover { background: rgb(255 255 255 / 0.12); }
+.profile-link span { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .brand { font-weight: 700; font-size: 1.05rem; padding: 0 var(--space-3) var(--space-5); }
 .brand small { display: block; font-weight: 400; opacity: 0.7; font-size: 0.8rem; }
 .nav-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }

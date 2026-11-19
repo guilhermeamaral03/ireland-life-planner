@@ -22,6 +22,10 @@ export type TaxStatus = 'solteiro' | 'pai_mae_solteiro' | 'casado_uma_renda' | '
 
 export interface Settings {
   id: 'main'
+  /** Perfil local (sem login): nome e foto de quem usa este aparelho. */
+  profileName: string
+  /** Foto já reduzida (data URL JPEG) ou null. */
+  profilePhoto: string | null
   taxYear: number | null
   grossAnnual: number | null
   taxStatus: TaxStatus | null

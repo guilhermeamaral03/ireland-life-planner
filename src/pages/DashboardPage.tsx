@@ -14,6 +14,7 @@ import {
   YAxis,
 } from 'recharts'
 import { useFinanceData } from '../app/useFinanceData'
+import { useProfile } from '../app/useProfile'
 import { getTaxRules } from '../data/tax'
 import { buildDashboard } from '../domain/dashboard'
 import { effectiveYear, ESTIMATE_DISCLAIMER, RULES_STATUS_LABELS } from '../domain/finance'
@@ -34,6 +35,8 @@ const compactEUR = new Intl.NumberFormat('pt-BR', {
 
 export function DashboardPage() {
   const { data, error } = useFinanceData()
+  const profile = useProfile()
+  const firstName = profile.name.split(/s+/)[0]
   const d = useMemo(() => (data ? buildDashboard(data.settings, data.expenses, data.categories) : null), [data])
 
   if (error) return <div className="page"><div className="alert alert-error">{error}</div></div>
@@ -41,7 +44,7 @@ export function DashboardPage() {
 
   const header = (
     <header className="page-header">
-      <h1>Dashboard</h1>
+      <h1>{firstName ? `Olá, ${firstName}` : 'Dashboard'}</h1>
       <p>Visão consolidada da sua situação financeira.</p>
     </header>
   )

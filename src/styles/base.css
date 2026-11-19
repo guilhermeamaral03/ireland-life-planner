@@ -118,3 +118,8 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-sp
 .safety-moderada { background: var(--warning-bg); color: var(--warning); }
 .safety-elevada { background: var(--danger-bg); color: var(--danger); }
 .safety-insuficiente { background: var(--gray-100); color: var(--gray-700); }
+
+/* perfil */
+.avatar { border-radius: 50%; object-fit: cover; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
+.avatar-initials { background: var(--green-100); color: var(--green-900); font-weight: 700; }
+.profile-row { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; }

@@ -35,6 +35,8 @@ db.version(3).stores({ crimeStations: 'code' })
 
 export const DEFAULT_SETTINGS: Settings = {
   id: 'main',
+  profileName: '',
+  profilePhoto: null,
   taxYear: null,
   grossAnnual: null,
   taxStatus: null,
