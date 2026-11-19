@@ -170,3 +170,16 @@ Usuário pediu base maior; critério: até ~1 h de deslocamento até Cork City. 
 - **Classificação pela TENDÊNCIA** (escolha do usuário): último ano vs. média dos 3 anos anteriores, somando ofensas 03, 06, 07, 08, 12, 13 (padrão). Alta > 15% → Atenção elevada; 5–15% → Atenção moderada; ≤ 5% (estável/queda) → Baixa atenção; sem estação, < 4 anos com dado ou média 0 → Dados insuficientes. Limites, anos de base e tipos editáveis. Rótulo fixo: "avaliação do app sobre a tendência da estação — não é nível de segurança nem estatística oficial".
 - **Estação ↔ localidade:** automática só quando o nome da estação é igual ao da localidade; demais (incl. Cork City) o usuário escolhe; origem registrada ("mesmo nome" / "escolhida por você").
 - **Dados guardados no aparelho** após "Atualizar dados do CSO" (funciona offline depois), com data da consulta e data de atualização do CSO; apenas estações das divisões Cork City e Cork County.
+
+## 19. Simplificação pós-uso (aprovada em 2026-11-19)
+
+Retorno de uso: informações repetidas em várias abas e muitas telas fazendo contas próprias.
+
+- **Fonte única das finanças:** Simulador (renda) → Despesas (todos os gastos, inclusive aluguel) → Dashboard (único lugar com saldo, economia e projeção).
+- **Cenários removido** (menu, rota e telas). Dados antigos permanecem no banco/backup.
+- **Simulador:** sem campo de aluguel; Rent Tax Credit usa sempre o aluguel de Despesas.
+- **Imóveis:** lista de controle — título, link, localidade, tipo, aluguel, contas incluídas, observações, favorito. Sem custo/saldo/comparação. Botão "Usar este aluguel nas minhas despesas": 0 despesas de Aluguel → cria; 1 → atualiza para mensal com o valor; >1 → pede confirmação e substitui por uma.
+- **Comparador de localidades:** só fatos (aluguel, distância, tempos, dependência de carro, segurança, notas).
+- **Ficha da localidade:** sem "custo mensal de transporte".
+- **Perfil local (sem login/senha):** nome e foto por aparelho, em Configurações; foto recortada em quadrado e reduzida (256 px, JPEG); aparece no menu e no Dashboard ("Olá, nome"); entra no backup.
+- Campos que saíram das telas continuam guardados (nenhum dado apagado).
