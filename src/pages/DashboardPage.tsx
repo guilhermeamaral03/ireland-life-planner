@@ -1,3 +1,4 @@
+import { firstName } from '../domain/image'
 import { Loading } from '../components/Loading'
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
@@ -36,7 +37,7 @@ const compactEUR = new Intl.NumberFormat('pt-BR', {
 export function DashboardPage() {
   const { data, error } = useFinanceData()
   const profile = useProfile()
-  const firstName = profile.name.split(/s+/)[0]
+  const first = firstName(profile.name)
   const d = useMemo(() => (data ? buildDashboard(data.settings, data.expenses, data.categories) : null), [data])
 
   if (error) return <div className="page"><div className="alert alert-error">{error}</div></div>
@@ -44,7 +45,7 @@ export function DashboardPage() {
 
   const header = (
     <header className="page-header">
-      <h1>{firstName ? `Olá, ${firstName}` : 'Dashboard'}</h1>
+      <h1>{first ? `Olá, ${first}` : 'Dashboard'}</h1>
       <p>Visão consolidada da sua situação financeira.</p>
     </header>
   )

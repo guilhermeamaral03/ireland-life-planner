@@ -13,6 +13,11 @@ export function initials(name: string): string {
   return (first + last).toUpperCase()
 }
 
+/** Primeiro nome, para a saudação do Dashboard. */
+export function firstName(name: string): string {
+  return name.trim().split(/\s+/)[0] ?? ''
+}
+
 /** Lê uma foto, recorta em quadrado e reduz para `size` px (JPEG) — fica leve no banco e no backup. */
 export async function resizeToDataUrl(file: File, size = 256): Promise<string> {
   if (!file.type.startsWith('image/')) throw new Error('O arquivo escolhido não é uma imagem.')

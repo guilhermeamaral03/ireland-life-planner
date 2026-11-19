@@ -17,3 +17,11 @@ describe('initials', () => {
     expect(initials('')).toBe('')
   })
 })
+
+describe('firstName', () => {
+  it('primeiro nome para a saudação', async () => {
+    const { firstName } = await import('./image')
+    expect(firstName('  Guilherme   Amaral ')).toBe('Guilherme')
+    expect(firstName('')).toBe('')
+  })
+})

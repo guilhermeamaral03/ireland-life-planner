@@ -15,21 +15,21 @@ Design completo e decisões: `docs/superpowers/specs/2026-11-19-ireland-life-pla
 
 | Menu | O que faz |
 |---|---|
-| **Dashboard** | Salário bruto/líquido, despesas, saldo, economia, reserva, distribuição das despesas e projeção da reserva. |
-| **Simulador de renda** | Income Tax, USC, PRSI e Rent Tax Credit da Irlanda, com detalhamento linha a linha e fontes. 2026 (oficial) e 2027 (proposto). |
-| **Despesas** | Despesas fixas/variáveis com frequência semanal, mensal, trimestral ou anual; categorias personalizadas. |
-| **Cenários** | Simula condições de vida (dividir apartamento, com/sem carro…) e compara 2 a 4 lado a lado. |
+| **Dashboard** | O único lugar com as contas: salário bruto/líquido, despesas, saldo, economia, reserva, distribuição e projeção. |
+| **Simulador de renda** | Income Tax, USC, PRSI e Rent Tax Credit (usa o aluguel de Despesas), com detalhamento e fontes. 2026 (oficial) e 2027 (proposto). |
+| **Despesas** | Todos os gastos, inclusive o aluguel (fonte única); frequência semanal, mensal, trimestral ou anual; categorias personalizadas. |
 | **Mapa de Cork** | 31 localidades (OpenStreetMap), ficha editável, distância em linha reta, rota de carro (OSRM) e link de transporte público. |
 | **Segurança** | Ocorrências por estação da Garda (CSO, tabela CJA11) e avaliação da **tendência** — não é estatística oficial. |
-| **Comparador de localidades** | Custo, acesso, segurança e economia de 2 a 4 localidades. |
-| **Imóveis** | Anúncios cadastrados manualmente, custo total e impacto no saldo; comparação lado a lado. |
-| **Configurações** | Backup, importação e apagar dados. |
+| **Comparador de localidades** | Fatos de 2 a 4 localidades: aluguel, distância, tempos, dependência de carro, segurança e notas. |
+| **Imóveis** | Anúncios para controle (link, localidade, aluguel). Botão **"Usar este aluguel nas minhas despesas"**. |
+| **Configurações** | Perfil (nome e foto, sem login), backup, importação e apagar dados. |
+
+Fluxo: **Simulador → Despesas → Dashboard**. As demais telas são de consulta — cada informação é digitada uma vez.
 
 ## Regras de honestidade dos dados
 
 - Nada é inventado: sem dado, aparece **"Não disponível"**.
 - Toda estimativa é rotulada (ex.: "estimativa sem trânsito — OSRM", "proposto — Finance Bill ainda não promulgado").
-- Cada parcela de custo mostra de onde veio ("do imóvel", "da localidade", "das suas despesas").
 - A avaliação de segurança mostra o critério, a estação usada e as limitações.
 
 ## Fontes
