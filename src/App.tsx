@@ -7,7 +7,6 @@ import { LocationComparePage } from './pages/LocationComparePage'
 import { MapPage } from './pages/MapPage'
 import { PropertiesPage } from './pages/PropertiesPage'
 import { SafetyPage } from './pages/SafetyPage'
-import { ScenariosPage } from './pages/ScenariosPage'
 import { SettingsPage } from './pages/SettingsPage'
 
 export default function App() {
@@ -17,7 +16,6 @@ export default function App() {
         <Route path="/" element={<DashboardPage />} />
         <Route path="/renda" element={<IncomePage />} />
         <Route path="/despesas" element={<ExpensesPage />} />
-        <Route path="/cenarios" element={<ScenariosPage />} />
         <Route path="/mapa" element={<MapPage />} />
         <Route path="/comparador" element={<LocationComparePage />} />
         <Route path="/imoveis" element={<PropertiesPage />} />

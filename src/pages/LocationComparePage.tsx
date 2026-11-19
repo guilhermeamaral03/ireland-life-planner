@@ -1,34 +1,28 @@
 import { Loading } from '../components/Loading'
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
-import { Link } from 'react-router-dom'
-import { useFinanceData } from '../app/useFinanceData'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useSafety } from '../app/useSafety'
 import { SafetyBadge } from '../components/SafetyBadge'
 import { STATION_AREA_NOTE } from '../domain/safety'
 import { db } from '../db/db'
 import type { Location } from '../db/types'
-import { toggleCompare } from '../domain/compare'
-import { PartText, RangeText } from '../components/HousingFormat'
-import { ESTIMATE_DISCLAIMER, computeTax, netMonthlyForRent } from '../domain/finance'
+import { bestBy, toggleCompare } from '../domain/compare'
 import { formatEUR, formatKm, NOT_AVAILABLE } from '../domain/format'
 import { haversineKm } from '../domain/geo'
-import { baselineFromExpenses, bestBy, locationCost, type HousingCost, type Part, type Range } from '../domain/housing'
 import { normalizeLocation } from '../domain/locations'
 import './LocationComparePage.css'
 
 const DEP = { baixa: 'Baixa', media: 'Média', alta: 'Alta' } as const
 
-const range = (r: Range | null) => <RangeText r={r} />
-const part = (p: Part, itemLabel: string) => <PartText p={p} itemLabel={itemLabel} />
+const rentRange = (r: { min: number; max: number } | null) =>
+  r === null ? NOT_AVAILABLE : r.min === r.max ? formatEUR(r.min) : `${formatEUR(r.min)} – ${formatEUR(r.max)}`
 
 interface Row {
   label: string
-  cell(l: Location, c: HousingCost): ReactNode
+  cell(l: Location): ReactNode
   best?: Set<Location>
 }
 
 export function LocationComparePage() {
-  const { data, error } = useFinanceData()
   const safety = useSafety()
   const [locations, setLocations] = useState<Location[] | null>(null)
   const [selected, setSelected] = useState<number[]>([])
@@ -47,22 +41,10 @@ export function LocationComparePage() {
       )
   }, [])
 
-  const ctx = useMemo(() => {
-    if (!data) return null
-    const tax = computeTax(data.settings, data.expenses, data.categories)
-    return {
-      tax,
-      netFor: netMonthlyForRent(data.settings, data.expenses, data.categories),
-      base: baselineFromExpenses(data.expenses, data.categories),
-    }
-  }, [data])
-
-  if (error) return <div className="page"><div className="alert alert-error">{error}</div></div>
-  if (!data || !ctx || !locations) return <Loading />
+  if (!locations) return <Loading />
 
   const reference = locations.find((l) => l.isReference)
   const chosen = selected.map((id) => locations.find((l) => l.id === id)!).filter(Boolean)
-  const costs = new Map(chosen.map((l) => [l, locationCost(l, ctx.base, ctx.netFor)]))
   const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
   const list = locations.filter((l) => fold(l.name).includes(fold(query.trim())))
 
@@ -74,7 +56,6 @@ export function LocationComparePage() {
 
   const bestRent = bestBy(chosen, (l) => l.rentRange.value?.max ?? null, 'min')
   const bestCar = bestBy(chosen, (l) => (l.isReference ? null : (l.carRoute.value?.minutes ?? null)), 'min')
-  const bestSaving = bestBy(chosen, (l) => costs.get(l)!.saving?.min ?? null, 'max')
 
   const rows: Row[] = [
     {
@@ -82,21 +63,11 @@ export function LocationComparePage() {
       best: bestRent,
       cell: (l) => (
         <>
-          {range(l.rentRange.value)}
+          {rentRange(l.rentRange.value)}
           {l.rentRange.source && <span className="origin">Fonte: {l.rentRange.source}</span>}
         </>
       ),
     },
-    { label: 'Contas da casa', cell: (_l, c) => part(c.bills, 'da localidade') },
-    { label: 'Transporte', cell: (_l, c) => part(c.transport, 'da localidade') },
-    { label: 'Outras despesas', cell: (_l, c) => <>{formatEUR(c.other)} <span className="origin">das suas despesas</span></> },
-    { label: 'Custo mensal estimado', cell: (_l, c) => <strong>{range(c.total)}</strong> },
-    {
-      label: 'Líquido mensal (com Rent Tax Credit)',
-      cell: (_l, c) => range(c.net ? { min: Math.min(c.net.atMinRent, c.net.atMaxRent), max: Math.max(c.net.atMinRent, c.net.atMaxRent) } : null),
-    },
-    { label: 'Saldo mensal', cell: (_l, c) => range(c.balance) },
-    { label: 'Economia mensal', best: bestSaving, cell: (_l, c) => range(c.saving) },
     {
       label: 'Até Cork City (linha reta)',
       cell: (l) => (l.isReference ? 'Referência' : reference ? formatKm(haversineKm(l, reference)) : NOT_AVAILABLE),
@@ -137,15 +108,8 @@ export function LocationComparePage() {
     <div className="page">
       <header className="page-header">
         <h1>Comparador de localidades</h1>
-        <p>Compare custo, acesso e capacidade de poupança entre 2 e 4 localidades. Sem nota final — você decide o peso de cada critério.</p>
+        <p>Compare aluguel, acesso, segurança e estrutura de 2 a 4 localidades. Sem nota final — você decide o peso de cada critério.</p>
       </header>
-
-      {ctx.tax === null && (
-        <p className="muted">
-          Para ver saldo e economia, <Link to="/renda">informe seu salário no simulador</Link>.
-        </p>
-      )}
-      {ctx.tax && !ctx.tax.ok && <p className="muted">Renda indisponível: {ctx.tax.reason}</p>}
 
       <section className="card">
         <div className="field">
@@ -186,7 +150,7 @@ export function LocationComparePage() {
                     <td>{r.label}</td>
                     {chosen.map((l) => (
                       <td key={l.id} className={r.best?.has(l) ? 'best-cell' : ''}>
-                        {r.cell(l, costs.get(l)!)}
+                        {r.cell(l)}
                       </td>
                     ))}
                   </tr>
@@ -195,11 +159,9 @@ export function LocationComparePage() {
             </table>
           </div>
           <p className="disclaimer">
-            Fundo verde: melhor da linha entre as localidades com dado (menor aluguel máximo, menor tempo de carro, maior
-            economia no pior caso). Segurança: avaliação do app sobre a tendência da estação, não estatística oficial; {STATION_AREA_NOTE.toLowerCase()} Custo = aluguel + contas + transporte + suas outras despesas atuais.{' '}
-            {ESTIMATE_DISCLAIMER}
+            Fundo verde: melhor da linha entre as localidades com dado (menor aluguel máximo, menor tempo de carro).
+            Segurança: avaliação do app sobre a tendência da estação, não estatística oficial; {STATION_AREA_NOTE.toLowerCase()}
           </p>
-          <p className="disclaimer">O líquido de cada localidade considera o Rent Tax Credit do aluguel dela.</p>
         </section>
       )}
     </div>

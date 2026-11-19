@@ -10,7 +10,6 @@ export const NAV_ITEMS: NavItem[] = [
   { path: '/', label: 'Dashboard', stage: 1, enabled: true },
   { path: '/renda', label: 'Simulador de renda', stage: 2, enabled: true },
   { path: '/despesas', label: 'Despesas', stage: 2, enabled: true },
-  { path: '/cenarios', label: 'Cenários', stage: 3, enabled: true },
   { path: '/mapa', label: 'Mapa de Cork', stage: 4, enabled: true },
   { path: '/seguranca', label: 'Segurança', stage: 6, enabled: true },
   { path: '/comparador', label: 'Comparador de localidades', stage: 5, enabled: true },

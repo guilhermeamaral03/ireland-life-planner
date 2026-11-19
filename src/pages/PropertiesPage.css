@@ -1,7 +1,11 @@
-.prop-sub { margin: -4px 0 0; font-size: 0.88rem; }
-.property-form { display: grid; grid-template-columns: 1fr minmax(280px, 380px); gap: var(--space-4); align-items: start; }
-.property-live { position: sticky; top: var(--space-4); }
-@media (max-width: 1000px) {
-  .property-form { grid-template-columns: 1fr; }
-  .property-live { position: static; }
-}
+.prop-actions { margin-bottom: var(--space-4); }
+.prop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: var(--space-4); }
+.prop-card { margin-bottom: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+.prop-card h2 { margin: 0; word-break: break-word; }
+.prop-sub { margin: 0; font-size: 0.88rem; }
+.prop-rent { margin: 0; font-size: 1.3rem; font-weight: 650; font-variant-numeric: tabular-nums; }
+.prop-rent .muted { font-size: 0.85rem; font-weight: 400; }
+.prop-notes { margin: 0; font-size: 0.9rem; white-space: pre-wrap; }
+.prop-card .row:last-child { margin-top: auto; }
+.property-form-lean { max-width: 720px; }
+.btn-sm { min-height: 32px; padding: 0 var(--space-3); font-size: 0.85rem; }

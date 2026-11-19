@@ -151,11 +151,6 @@ export function LocationSheet({ location, reference, routeStatus, onSave, onDele
             : NOT_AVAILABLE}
           {location.rentRange.source && <span className="fact-note">Fonte: {location.rentRange.source}</span>}
         </dd>
-        <dt>Transporte mensal até Cork City</dt>
-        <dd>
-          {location.transportMonthly.value !== null ? `€ ${location.transportMonthly.value.toLocaleString('pt-BR')}/mês` : NOT_AVAILABLE}
-          {location.transportMonthly.source && <span className="fact-note">Fonte: {location.transportMonthly.source}</span>}
-        </dd>
         <dt>Dependência de carro</dt>
         <dd>{location.carDependency.value ? DEP_LABELS[location.carDependency.value] : NOT_AVAILABLE}</dd>
         <dt>Segurança (tendência da estação da Garda)</dt>
@@ -213,23 +208,6 @@ export function LocationSheet({ location, reference, routeStatus, onSave, onDele
             source={d.rentRange.source}
             date={d.rentRange.date}
             onChange={(source, date) => setD({ ...d, rentRange: { ...d.rentRange, source, date } })}
-          />
-
-          <h3 className="form-subtitle">Custo mensal de transporte até Cork City</h3>
-          <NumberField
-            label="Valor mensal"
-            value={d.transportMonthly.value}
-            min={0}
-            suffix="€/mês"
-            hint="Ex.: passe mensal de ônibus/trem ou combustível estimado. Vazio = o comparador usa suas despesas de transporte."
-            onValidityChange={validity('tmonthly')}
-            onChange={(value) => setD({ ...d, transportMonthly: { ...d.transportMonthly, value } })}
-          />
-          <SourceFields
-            id="tmonthly"
-            source={d.transportMonthly.source}
-            date={d.transportMonthly.date}
-            onChange={(source, date) => setD({ ...d, transportMonthly: { ...d.transportMonthly, source, date } })}
           />
 
           <h3 className="form-subtitle">Transporte público até Cork City</h3>

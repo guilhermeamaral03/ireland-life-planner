@@ -14,7 +14,7 @@ beforeEach(async () => {
 })
 
 describe('IncomePage', () => {
-  it('aluguel inválido esconde o resultado e não salva outro valor', async () => {
+  it('salário inválido esconde o resultado e não salva outro valor', async () => {
     render(
       <MemoryRouter>
         <IncomePage />
@@ -22,9 +22,9 @@ describe('IncomePage', () => {
     )
     expect(await screen.findByText('Líquido mensal')).toBeInTheDocument()
 
-    fireEvent.change(screen.getByLabelText('Aluguel mensal (para o Rent Tax Credit)'), { target: { value: '-5' } })
+    fireEvent.change(screen.getByLabelText('Salário bruto anual'), { target: { value: '-5' } })
     expect(await screen.findByText('Corrija os campos marcados como inválidos.')).toBeInTheDocument()
     expect(screen.queryByText('Líquido mensal')).not.toBeInTheDocument()
-    expect((await getSettings()).rentMonthlyOverride).toBeNull()
+    expect((await getSettings()).grossAnnual).toBe(50000)
   })
 })

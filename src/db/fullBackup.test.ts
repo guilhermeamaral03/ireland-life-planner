@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import fixture from '../services/__fixtures__/cja11-mini.json'
 import { parseCja11, saveStations } from '../services/cso'
 import { emptyProperty } from '../domain/properties'
-import { emptyScenario } from '../domain/scenarios'
 import { clearAllData, exportBackup, importBackup, parseBackup } from './backup'
 import { db, ensureSeeded, saveSettings, TABLE_NAMES } from './db'
 
@@ -21,7 +20,8 @@ describe('backup de ponta a ponta', () => {
     const aluguel = (await db.categories.where('name').equals('Aluguel').first())!.id!
     await db.expenses.add({ name: 'Quarto', categoryId: aluguel, amount: 950, frequency: 'mensal', kind: 'fixa' })
     await db.categories.add({ name: 'Academia', group: 'outros', builtIn: false })
-    await db.scenarios.add({ ...emptyScenario('Com carro'), grossAnnual: 60000 })
+    // cenários saíram da tela, mas dados antigos continuam no backup
+    await db.scenarios.add({ name: 'Com carro', grossAnnual: 60000, taxStatus: null, spouseGrossAnnual: null, initialReserve: null, amounts: { aluguel: 0, contas: 0, alimentacao: 0, transporte: 0, pessoais: 0, outros: 0 } })
     const bal = (await db.locations.where('name').equals('Ballincollig').first())!
     await db.locations.update(bal.id!, {
       favorite: true,

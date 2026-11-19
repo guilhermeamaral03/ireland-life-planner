@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { Loading } from '../components/Loading'
 import { useMemo, useRef, useState } from 'react'
 import { useFinanceData } from '../app/useFinanceData'
@@ -114,24 +115,10 @@ export function IncomePage() {
               />
             )}
 
-            <NumberField
-              label="Aluguel mensal (para o Rent Tax Credit)"
-              value={s.rentMonthlyOverride ?? rentFromExpenses}
-              min={0}
-              suffix="€/mês"
-              hint={
-                s.rentMonthlyOverride === null
-                  ? 'Calculado a partir da categoria Aluguel nas suas despesas. Não inclua contas.'
-                  : 'Valor informado aqui (sobrepõe o das despesas).'
-              }
-              onValidityChange={validity('rent')}
-              onChange={guard('rent', (v: number | null) => update({ rentMonthlyOverride: v }))}
-            />
-            {s.rentMonthlyOverride !== null && (
-              <button type="button" className="btn" onClick={() => update({ rentMonthlyOverride: null })}>
-                Usar o aluguel das despesas ({formatEUR(rentFromExpenses)})
-              </button>
-            )}
+            <p className="field-hint">
+              Rent Tax Credit: usa o aluguel cadastrado em Despesas ({formatEUR(rentFromExpenses)}/mês).{' '}
+              <Link to="/despesas">Editar em Despesas</Link>
+            </p>
 
             <label className="check">
               <input

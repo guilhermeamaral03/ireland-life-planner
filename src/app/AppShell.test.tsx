@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { AppShell } from './AppShell'
 
 const ORDER = [
-  'Dashboard', 'Simulador de renda', 'Despesas', 'Cenários', 'Mapa de Cork',
+  'Dashboard', 'Simulador de renda', 'Despesas', 'Mapa de Cork',
   'Segurança', 'Comparador de localidades', 'Imóveis', 'Configurações',
 ]
 
@@ -19,7 +19,7 @@ describe('AppShell', () => {
       </MemoryRouter>,
     )
 
-  it('mostra os 9 itens de navegação na ordem', () => {
+  it('mostra os 8 itens de navegação na ordem', () => {
     setup()
     const nav = screen.getByRole('navigation', { name: 'Navegação principal' })
     const labels = Array.from(nav.querySelectorAll('[data-nav-label]')).map((el) => el.textContent)

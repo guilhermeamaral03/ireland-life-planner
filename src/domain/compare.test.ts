@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { assignColorSlots, pruneSelection, toggleCompare } from './compare'
+import { bestBy, pruneSelection, toggleCompare } from './compare'
 
 describe('toggleCompare', () => {
   it('adiciona até 4', () => {
@@ -22,19 +22,20 @@ describe('toggleCompare', () => {
   })
 })
 
-describe('assignColorSlots', () => {
-  it('cada cenário mantém sua cor; o novo pega o menor slot livre', () => {
-    const a = assignColorSlots({}, [10, 20, 30])
-    expect(a).toEqual({ 10: 0, 20: 1, 30: 2 })
-    const b = assignColorSlots(a, [10, 30]) // 20 saiu
-    expect(b).toEqual({ 10: 0, 30: 2 })
-    const c = assignColorSlots(b, [10, 30, 40])
-    expect(c).toEqual({ 10: 0, 30: 2, 40: 1 })
-  })
-})
-
 describe('pruneSelection', () => {
   it('remove ids que não existem mais', () => {
     expect(pruneSelection([1, 2, 9], [1, 2, 3])).toEqual([1, 2])
+  })
+})
+
+describe('bestBy', () => {
+  it('melhor por critério, empates incluídos, ignora sem dado', () => {
+    const items = [{ v: 3 }, { v: 1 }, { v: null }, { v: 1 }]
+    expect([...bestBy(items, (i) => i.v, 'min')]).toEqual([items[1], items[3]])
+    expect([...bestBy(items, (i) => i.v, 'max')]).toEqual([items[0]])
+    expect(bestBy([{ v: 1 }, { v: null }], (i) => i.v, 'min').size).toBe(0)
+  })
+  it('todos iguais → nenhum destaque', () => {
+    expect(bestBy([{ v: 0 }, { v: 0 }], (i) => i.v, 'max').size).toBe(0)
   })
 })

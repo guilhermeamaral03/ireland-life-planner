@@ -10,25 +10,18 @@ export function toggleCompare(
   return { selected: [...selected, id], error: null }
 }
 
-/** Paleta categórica validada (adjacentes, modo claro) — cor acompanha o cenário, não a posição. */
-export const COMPARE_COLORS = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100']
-
-/** Mantém o slot de cor de quem continua selecionado; novos recebem o menor slot livre. */
-export function assignColorSlots(prev: Record<number, number>, selected: number[]): Record<number, number> {
-  const next: Record<number, number> = {}
-  for (const id of selected) if (id in prev) next[id] = prev[id]
-  const used = new Set(Object.values(next))
-  for (const id of selected) {
-    if (id in next) continue
-    let slot = 0
-    while (used.has(slot)) slot++
-    next[id] = slot
-    used.add(slot)
-  }
-  return next
-}
-
 export function pruneSelection(selected: number[], existingIds: number[]): number[] {
   const exists = new Set(existingIds)
   return selected.filter((id) => exists.has(id))
+}
+
+/** Melhor(es) item(ns) por um critério; ignora quem não tem dado; precisa de ≥ 2 com dado e alguma diferença. */
+export function bestBy<T>(items: T[], score: (t: T) => number | null, prefer: 'min' | 'max'): Set<T> {
+  const scored = items
+    .map((t) => [t, score(t)] as const)
+    .filter((x): x is readonly [T, number] => typeof x[1] === 'number' && Number.isFinite(x[1]))
+  if (scored.length < 2) return new Set()
+  if (scored.every((x) => x[1] === scored[0][1])) return new Set()
+  const target = prefer === 'min' ? Math.min(...scored.map((x) => x[1])) : Math.max(...scored.map((x) => x[1]))
+  return new Set(scored.filter((x) => x[1] === target).map((x) => x[0]))
 }
