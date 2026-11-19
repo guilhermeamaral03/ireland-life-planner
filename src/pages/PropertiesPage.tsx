@@ -21,6 +21,7 @@ export function PropertiesPage() {
   const [locations, setLocations] = useState<Location[]>([])
   const [editing, setEditing] = useState<Property | null>(null)
   const [onlyFav, setOnlyFav] = useState(false)
+  const [applying, setApplying] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string; toExpenses?: boolean } | null>(null)
 
   const load = useCallback(async () => {
@@ -52,6 +53,8 @@ export function PropertiesPage() {
   }
 
   const useRent = async (p: Property) => {
+    if (applying) return
+    setApplying(true)
     try {
       const r = await applyRentToExpenses(p.rent, p.title, (n) =>
         window.confirm(`Você tem ${n} despesas de aluguel. Substituir todas por ${formatEUR(p.rent)}/mês deste imóvel?`),
@@ -60,6 +63,8 @@ export function PropertiesPage() {
       setMessage({ type: 'success', text: RESULT_TEXT[r], toExpenses: true })
     } catch (x) {
       setMessage({ type: 'error', text: x instanceof Error ? x.message : String(x) })
+    } finally {
+      setApplying(false)
     }
   }
 
@@ -130,7 +135,7 @@ export function PropertiesPage() {
               </p>
               {p.notes && <p className="prop-notes">{p.notes}</p>}
               <div className="row">
-                <button type="button" className="btn btn-sm btn-primary" onClick={() => useRent(p)}>
+                <button type="button" className="btn btn-sm btn-primary" onClick={() => useRent(p)} disabled={applying}>
                   Usar este aluguel nas minhas despesas
                 </button>
               </div>

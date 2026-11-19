@@ -33,6 +33,12 @@ db.version(1).stores({
 db.version(2).stores({ locations: '++id,name' })
 db.version(3).stores({ crimeStations: 'code' })
 
+/** Disparado quando nome/foto do perfil podem ter mudado (salvar perfil, importar, apagar tudo). */
+export const PROFILE_EVENT = 'ilp:profile-changed'
+export function notifyProfileChanged(): void {
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event(PROFILE_EVENT))
+}
+
 export const DEFAULT_SETTINGS: Settings = {
   id: 'main',
   profileName: '',

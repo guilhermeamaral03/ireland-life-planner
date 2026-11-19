@@ -1,4 +1,4 @@
-import { db, ensureSeeded, getSettings, TABLE_NAMES, type TableName } from './db'
+import { db, ensureSeeded, getSettings, notifyProfileChanged, TABLE_NAMES, type TableName } from './db'
 import type { Settings } from './types'
 
 export const BACKUP_APP_ID = 'ireland-life-planner'
@@ -83,6 +83,7 @@ export async function importBackup(data: BackupFile): Promise<void> {
     }
   })
   await ensureSeeded()
+  notifyProfileChanged()
 }
 
 export async function clearAllData(): Promise<void> {
@@ -90,6 +91,7 @@ export async function clearAllData(): Promise<void> {
     for (const name of TABLE_NAMES) await table(name).clear()
   })
   await ensureSeeded()
+  notifyProfileChanged()
 }
 
 export async function downloadBackup(): Promise<void> {

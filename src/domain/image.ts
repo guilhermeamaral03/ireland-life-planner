@@ -20,8 +20,15 @@ export function firstName(name: string): string {
 
 /** Lê uma foto, recorta em quadrado e reduz para `size` px (JPEG) — fica leve no banco e no backup. */
 export async function resizeToDataUrl(file: File, size = 256): Promise<string> {
-  if (!file.type.startsWith('image/')) throw new Error('O arquivo escolhido não é uma imagem.')
-  const bitmap = await createImageBitmap(file)
+  const friendly = 'Não foi possível usar essa imagem. Tente uma foto em JPEG ou PNG.'
+  // alguns seletores do Android não informam o tipo: só recusa se for claramente outra coisa
+  if (file.type && !file.type.startsWith('image/')) throw new Error(friendly)
+  let bitmap: ImageBitmap
+  try {
+    bitmap = await createImageBitmap(file)
+  } catch {
+    throw new Error(friendly)
+  }
   try {
     const { sx, sy, side } = squareCrop(bitmap.width, bitmap.height)
     const out = Math.min(size, side)

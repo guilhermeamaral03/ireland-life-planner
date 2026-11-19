@@ -56,3 +56,10 @@ describe('applyRentToExpenses', () => {
     await expect(applyRentToExpenses(0, 'X', () => true)).rejects.toThrow('Aluguel inválido.')
   })
 })
+
+describe('applyRentToExpenses — toque duplo', () => {
+  it('duas chamadas simultâneas não criam aluguel em dobro', async () => {
+    await Promise.all([applyRentToExpenses(950, 'Apto', () => true), applyRentToExpenses(950, 'Apto', () => true)])
+    expect(await rentExpenses()).toHaveLength(1)
+  })
+})

@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getSettings, saveSettings } from '../db/db'
-
-const EVENT = 'ilp:profile-changed'
+import { getSettings, notifyProfileChanged, PROFILE_EVENT as EVENT, saveSettings } from '../db/db'
 
 export interface Profile {
   name: string
@@ -28,5 +26,5 @@ export async function saveProfile(patch: Partial<Profile>): Promise<void> {
     ...(patch.name !== undefined ? { profileName: patch.name.trim() } : {}),
     ...(patch.photo !== undefined ? { profilePhoto: patch.photo } : {}),
   })
-  window.dispatchEvent(new Event(EVENT))
+  notifyProfileChanged()
 }
