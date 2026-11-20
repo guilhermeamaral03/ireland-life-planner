@@ -2,10 +2,10 @@ import { Loading } from '../components/Loading'
 import { useEffect, useState, type ReactNode } from 'react'
 import { useSafety } from '../app/useSafety'
 import { SafetyBadge } from '../components/SafetyBadge'
-import { STATION_AREA_NOTE } from '../domain/safety'
+import { SAFETY_LABELS, STATION_AREA_NOTE } from '../domain/safety'
 import { db } from '../db/db'
 import type { Location } from '../db/types'
-import { bestBy, toggleCompare } from '../domain/compare'
+import { bestBy, compareText, toggleCompare } from '../domain/compare'
 import { formatEUR, formatKm, NOT_AVAILABLE } from '../domain/format'
 import { haversineKm } from '../domain/geo'
 import { normalizeLocation, propertiesByLocation, routesSummary, sortLocations, type LocationSort } from '../domain/locations'
@@ -21,6 +21,8 @@ const rentRange = (r: { min: number; max: number } | null) =>
 interface Row {
   label: string
   cell(l: Location): ReactNode
+  /** Texto para o resumo compartilhado (quando a célula não é texto simples). */
+  text?(l: Location): string
   best?: Set<Location>
 }
 
@@ -32,6 +34,7 @@ export function LocationComparePage() {
   const [warn, setWarn] = useState<string | null>(null)
   const [routeMsg, setRouteMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const [routing, setRouting] = useState(false)
+  const [shareMsg, setShareMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const [sortBy, setSortBy] = useState<LocationSort>('nome')
   const [saved, setSaved] = useState<ReturnType<typeof propertiesByLocation>>(new Map())
 
@@ -77,6 +80,7 @@ export function LocationComparePage() {
     {
       label: 'Aluguel',
       best: bestRent,
+      text: (l) => rentRange(l.rentRange.value),
       cell: (l) => (
         <>
           {rentRange(l.rentRange.value)}
@@ -91,6 +95,8 @@ export function LocationComparePage() {
     {
       label: 'De carro (sem trânsito, OSRM)',
       best: bestCar,
+      text: (l) =>
+        l.isReference ? '—' : l.carRoute.value ? `${formatKm(l.carRoute.value.km)} · ${Math.round(l.carRoute.value.minutes)} min` : NOT_AVAILABLE,
       cell: (l) =>
         l.isReference ? '—' : l.carRoute.value ? `${formatKm(l.carRoute.value.km)} · ${Math.round(l.carRoute.value.minutes)} min` : (
             <button type="button" className="btn btn-sm" onClick={calcRoutes} disabled={routing}>
@@ -116,6 +122,7 @@ export function LocationComparePage() {
     { label: 'Supermercados', cell: (l) => l.supermarkets || NOT_AVAILABLE },
     {
       label: 'Segurança (tendência)',
+      text: (l) => SAFETY_LABELS[safety.classify(l).level],
       cell: (l) => {
         const r = safety.classify(l)
         return (
@@ -127,6 +134,34 @@ export function LocationComparePage() {
       },
     },
   ]
+
+  const share = async () => {
+    const text = compareText(
+      chosen.map((l) => l.name),
+      rows.map((r) => ({
+        label: r.label,
+        values: chosen.map((l) => {
+          if (r.text) return r.text(l)
+          const c = r.cell(l)
+          return typeof c === 'string' ? c : NOT_AVAILABLE
+        }),
+        best: chosen.flatMap((l, i) => (r.best?.has(l) ? [i] : [])),
+      })),
+    )
+    try {
+      if (navigator.share) {
+        await navigator.share({ text })
+        setShareMsg(null)
+      } else {
+        await navigator.clipboard.writeText(text)
+        setShareMsg({ ok: true, text: 'Resumo copiado — cole no WhatsApp ou onde quiser.' })
+      }
+    } catch (e) {
+      // fechar a janela de compartilhar não é erro
+      if (e instanceof DOMException && e.name === 'AbortError') return
+      setShareMsg({ ok: false, text: 'Não foi possível compartilhar neste navegador.' })
+    }
+  }
 
   return (
     <div className="page">
@@ -195,6 +230,17 @@ export function LocationComparePage() {
               </tbody>
             </table>
           </div>
+          <div className="row" style={{ marginTop: 'var(--space-3)' }}>
+            <button type="button" className="btn btn-primary" onClick={share}>
+              Enviar comparação
+            </button>
+            <span className="muted">Resumo em texto, pronto para o WhatsApp.</span>
+          </div>
+          {shareMsg && (
+            <div className={`alert ${shareMsg.ok ? 'alert-success' : 'alert-error'}`} role="status" style={{ marginTop: 'var(--space-3)' }}>
+              {shareMsg.text}
+            </div>
+          )}
           <p className="disclaimer">
             Fundo verde: melhor da linha entre as localidades com dado (menor aluguel máximo, menor tempo de carro).
             Segurança: avaliação do app sobre a tendência da estação, não estatística oficial; {STATION_AREA_NOTE.toLowerCase()}

@@ -20,7 +20,7 @@ Design completo e decisões: `docs/superpowers/specs/2026-11-19-ireland-life-pla
 | **Despesas** | Todos os gastos, inclusive o aluguel (fonte única); frequência semanal, mensal, trimestral ou anual; categorias personalizadas. Despesas comuns em um toque (você informa só o valor). |
 | **Mapa de Cork** | 31 localidades (OpenStreetMap), ficha editável, distância em linha reta, rota de carro (OSRM, todas de uma vez) e link de transporte público. Ordena por tempo de carro, filtra "até X min" e mostra os imóveis salvos em cada localidade. |
 | **Segurança** | Ocorrências por estação da Garda (CSO, tabela CJA11) e avaliação da **tendência** — não é estatística oficial. |
-| **Comparador de localidades** | Fatos de 2 a 4 localidades: aluguel, distância, tempos, imóveis salvos, dependência de carro, segurança e notas. |
+| **Comparador de localidades** | Fatos de 2 a 4 localidades: aluguel, distância, tempos, imóveis salvos, dependência de carro, segurança e notas. Botão **"Enviar comparação"** gera um resumo em texto para o WhatsApp. |
 | **Imóveis** | Anúncios para controle. Colando o link (Daft) ou o texto do anúncio, título, tipo, localidade, aluguel e contas são preenchidos; no Android dá para usar o botão **Compartilhar**. Botão **"Usar este aluguel nas minhas despesas"**. |
 | **Configurações** | Perfil (nome e foto, sem login), backup, importação e apagar dados. |
 

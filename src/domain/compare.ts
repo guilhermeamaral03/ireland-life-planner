@@ -25,3 +25,18 @@ export function bestBy<T>(items: T[], score: (t: T) => number | null, prefer: 'm
   const target = prefer === 'min' ? Math.min(...scored.map((x) => x[1])) : Math.max(...scored.map((x) => x[1]))
   return new Set(scored.filter((x) => x[1] === target).map((x) => x[0]))
 }
+
+const NA = 'Não disponível'
+
+/** Resumo em texto (formato do WhatsApp) da comparação; linhas sem nenhum dado são omitidas. */
+export function compareText(names: string[], rows: { label: string; values: string[]; best?: number[] }[]): string {
+  const out = ['*Comparação de localidades*', names.join(' × '), '']
+  for (const r of rows) {
+    if (r.values.every((v) => v.trim() === '' || v === NA)) continue
+    out.push(`*${r.label}*`)
+    r.values.forEach((v, i) => out.push(`• ${names[i]}: ${v.trim() || NA}${r.best?.includes(i) ? ' ✅' : ''}`))
+    out.push('')
+  }
+  out.push('✅ = melhor da linha. Estimativas do Ireland Life Planner; segurança é tendência da estação da Garda, não estatística oficial.')
+  return out.join('\n')
+}

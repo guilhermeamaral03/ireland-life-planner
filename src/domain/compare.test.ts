@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { bestBy, pruneSelection, toggleCompare } from './compare'
+import { bestBy, compareText, pruneSelection, toggleCompare } from './compare'
 
 describe('toggleCompare', () => {
   it('adiciona até 4', () => {
@@ -37,5 +37,31 @@ describe('bestBy', () => {
   })
   it('todos iguais → nenhum destaque', () => {
     expect(bestBy([{ v: 0 }, { v: 0 }], (i) => i.v, 'max').size).toBe(0)
+  })
+})
+
+describe('compareText (resumo para enviar pelo WhatsApp)', () => {
+  const rows = [
+    { label: 'Aluguel', values: ['€ 1.000,00', 'Não disponível'], best: [0] },
+    { label: 'Infraestrutura', values: ['Não disponível', 'Não disponível'] },
+    { label: 'De carro', values: ['9,3 km · 14 min', '22,5 km · 26 min'], best: [0] },
+  ]
+  it('título, localidades, uma linha por localidade, melhor marcado; pula linhas sem nenhum dado', () => {
+    expect(compareText(['Ballincollig', 'Cobh'], rows)).toBe(
+      [
+        '*Comparação de localidades*',
+        'Ballincollig × Cobh',
+        '',
+        '*Aluguel*',
+        '• Ballincollig: € 1.000,00 ✅',
+        '• Cobh: Não disponível',
+        '',
+        '*De carro*',
+        '• Ballincollig: 9,3 km · 14 min ✅',
+        '• Cobh: 22,5 km · 26 min',
+        '',
+        '✅ = melhor da linha. Estimativas do Ireland Life Planner; segurança é tendência da estação da Garda, não estatística oficial.',
+      ].join('\n'),
+    )
   })
 })
