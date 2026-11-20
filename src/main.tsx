@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { HashRouter } from 'react-router-dom'
 import App from './App'
+import { captureSharedListing } from './app/share'
 import { requestPersistence } from './app/storage'
 import { ensureSeeded } from './db/db'
 import 'leaflet/dist/leaflet.css'
@@ -11,6 +12,7 @@ import './styles/base.css'
 const root = createRoot(document.getElementById('root')!)
 
 requestPersistence()
+captureSharedListing()
 
 ensureSeeded()
   .then(() => {

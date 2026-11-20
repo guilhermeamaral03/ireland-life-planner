@@ -183,3 +183,11 @@ Retorno de uso: informações repetidas em várias abas e muitas telas fazendo c
 - **Ficha da localidade:** sem "custo mensal de transporte".
 - **Perfil local (sem login/senha):** nome e foto por aparelho, em Configurações; foto recortada em quadrado e reduzida (256 px, JPEG); aparece no menu e no Dashboard ("Olá, nome"); entra no backup.
 - Campos que saíram das telas continuam guardados (nenhum dado apagado).
+
+## 20. Imóveis — preenchimento a partir do anúncio (2026-11-20)
+
+Sem scraping e sem servidor (o navegador não pode ler o site do portal; os portais vedam extração):
+- **Link:** do endereço do Daft (`/for-rent/<tipo>-<endereço>/<id>` e `/share/...`) saem título, tipo e localidade conhecida (a que aparece mais ao fim do endereço). Outros portais: só a localidade, se aparecer no link.
+- **Texto colado:** aluguel (semanal convertido ×52/12; faixa → menor valor; sem período → mensal, com aviso), contas incluídas e tipo.
+- **Compartilhar (Android):** o app aparece no botão Compartilhar (Web Share Target, GET `?title&text&url`) e abre Imóveis já preenchido. iPhone não suporta: usar colar.
+- Nunca sobrescreve o que o usuário já preencheu ou mexeu; mostra o que foi preenchido e os avisos.

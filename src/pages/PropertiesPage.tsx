@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Loading } from '../components/Loading'
 import { PropertyForm } from '../components/PropertyForm'
 import { db } from '../db/db'
+import { clearSharedListing, getSharedListing } from '../app/share'
 import { applyRentToExpenses } from '../db/rent'
 import type { Location, Property } from '../db/types'
 import { formatEUR } from '../domain/format'
@@ -19,7 +20,13 @@ const RESULT_TEXT = {
 export function PropertiesPage() {
   const [properties, setProperties] = useState<Property[] | null>(null)
   const [locations, setLocations] = useState<Location[]>([])
-  const [editing, setEditing] = useState<Property | null>(null)
+  // anúncio recebido pelo botão Compartilhar: abre o formulário já preenchido
+  const [shared, setShared] = useState<string | null>(() => getSharedListing())
+  const [editing, setEditing] = useState<Property | null>(() => (getSharedListing() ? emptyProperty() : null))
+  const doneSharing = () => {
+    clearSharedListing()
+    setShared(null)
+  }
   const [onlyFav, setOnlyFav] = useState(false)
   const [applying, setApplying] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string; toExpenses?: boolean } | null>(null)
@@ -74,7 +81,19 @@ export function PropertiesPage() {
         <header className="page-header">
           <h1>Imóveis</h1>
         </header>
-        <PropertyForm initial={editing} locations={locations} onSave={save} onCancel={() => setEditing(null)} />
+        <PropertyForm
+          initial={editing}
+          locations={locations}
+          sharedText={shared ?? undefined}
+          onSave={async (p) => {
+            doneSharing()
+            await save(p)
+          }}
+          onCancel={() => {
+            doneSharing()
+            setEditing(null)
+          }}
+        />
       </div>
     )
   }

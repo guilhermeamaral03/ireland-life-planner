@@ -9,3 +9,5 @@
 .prop-card .row:last-child { margin-top: auto; }
 .property-form-lean { max-width: 720px; }
 .btn-sm { min-height: 32px; padding: 0 var(--space-3); font-size: 0.85rem; }
+.paste-box summary { cursor: pointer; color: var(--green-800); font-weight: 500; margin-bottom: var(--space-2); }
+.paste-box .field { margin-bottom: var(--space-2); }

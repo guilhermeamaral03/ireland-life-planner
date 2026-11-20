@@ -21,7 +21,7 @@ Design completo e decisões: `docs/superpowers/specs/2026-11-19-ireland-life-pla
 | **Mapa de Cork** | 31 localidades (OpenStreetMap), ficha editável, distância em linha reta, rota de carro (OSRM) e link de transporte público. |
 | **Segurança** | Ocorrências por estação da Garda (CSO, tabela CJA11) e avaliação da **tendência** — não é estatística oficial. |
 | **Comparador de localidades** | Fatos de 2 a 4 localidades: aluguel, distância, tempos, dependência de carro, segurança e notas. |
-| **Imóveis** | Anúncios para controle (link, localidade, aluguel). Botão **"Usar este aluguel nas minhas despesas"**. |
+| **Imóveis** | Anúncios para controle. Colando o link (Daft) ou o texto do anúncio, título, tipo, localidade, aluguel e contas são preenchidos; no Android dá para usar o botão **Compartilhar**. Botão **"Usar este aluguel nas minhas despesas"**. |
 | **Configurações** | Perfil (nome e foto, sem login), backup, importação e apagar dados. |
 
 Fluxo: **Simulador → Despesas → Dashboard**. As demais telas são de consulta — cada informação é digitada uma vez.

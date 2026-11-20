@@ -19,6 +19,12 @@ export default defineConfig(({ command }) => ({
         theme_color: '#1F4D3A',
         background_color: '#F7F7F5',
         display: 'standalone',
+        // Android: aparece no botão Compartilhar (ex.: app do Daft → Ireland Life Planner)
+        share_target: {
+          action: './',
+          method: 'GET',
+          params: { title: 'title', text: 'text', url: 'url' },
+        },
         start_url: './',
         scope: './',
         icons: [
