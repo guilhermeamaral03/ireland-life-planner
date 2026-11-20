@@ -7,8 +7,9 @@ import { db } from '../db/db'
 import type { Location } from '../db/types'
 import { formatKm } from '../domain/format'
 import { haversineKm } from '../domain/geo'
-import { filterLocations, newLocation, normalizeLocation } from '../domain/locations'
+import { filterLocations, newLocation, normalizeLocation, routesSummary } from '../domain/locations'
 import { fetchCarRoute, routeToSourced } from '../services/osrm'
+import { fillMissingRoutes } from '../db/routes'
 import './MapPage.css'
 
 type RouteStatus = 'idle' | 'loading' | { error: string }
@@ -26,6 +27,7 @@ export function MapPage() {
   const [tilesFailed, setTilesFailed] = useState(false)
   const [routeStatus, setRouteStatus] = useState<Record<number, RouteStatus>>({})
   const [message, setMessage] = useState<string | null>(null)
+  const [bulk, setBulk] = useState<'idle' | 'loading' | { error: string }>('idle')
   const attempted = useRef(new Set<number>())
 
   const load = useCallback(async () => setLocations((await db.locations.orderBy('id').toArray()).map(normalizeLocation)), [])
@@ -85,6 +87,16 @@ export function MapPage() {
 
   if (!locations) return <Loading />
 
+  const missingRoutes = locations.filter((l) => !l.isReference && !l.carRoute.value).length
+  const calcAll = async () => {
+    setBulk('loading')
+    const r = await fillMissingRoutes()
+    if (!r.ok) return setBulk({ error: r.reason })
+    setBulk('idle')
+    setMessage(routesSummary(r.filled, r.failed))
+    await load()
+  }
+
   const save = async (l: Location) => {
     const before = locations.find((x) => x.id === l.id)
     await db.locations.put(l)
@@ -117,6 +129,7 @@ export function MapPage() {
         <p>Localidades do County Cork, distância até Cork City e informações que você reunir.</p>
       </header>
       {message && <div className="alert alert-success" role="status">{message}</div>}
+      {typeof bulk === 'object' && <div className="alert alert-error" role="alert">{bulk.error}</div>}
 
       <div className="map-layout">
         <div className="map-col">
@@ -132,6 +145,11 @@ export function MapPage() {
               {adding ? 'Cancelar' : 'Adicionar localidade'}
             </button>
             {adding && !pending && <span className="muted">Clique no mapa no ponto da nova localidade.</span>}
+            {!adding && reference && missingRoutes > 0 && (
+              <button type="button" className="btn" onClick={calcAll} disabled={bulk === 'loading'}>
+                {bulk === 'loading' ? 'Calculando rotas…' : `Calcular rotas de carro que faltam (${missingRoutes})`}
+              </button>
+            )}
           </div>
           {pending && (
             <form className="card add-form" onSubmit={confirmAdd}>

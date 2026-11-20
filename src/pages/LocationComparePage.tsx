@@ -8,7 +8,8 @@ import type { Location } from '../db/types'
 import { bestBy, toggleCompare } from '../domain/compare'
 import { formatEUR, formatKm, NOT_AVAILABLE } from '../domain/format'
 import { haversineKm } from '../domain/geo'
-import { normalizeLocation } from '../domain/locations'
+import { normalizeLocation, routesSummary } from '../domain/locations'
+import { fillMissingRoutes } from '../db/routes'
 import './LocationComparePage.css'
 
 const DEP = { baixa: 'Baixa', media: 'Média', alta: 'Alta' } as const
@@ -28,8 +29,10 @@ export function LocationComparePage() {
   const [selected, setSelected] = useState<number[]>([])
   const [query, setQuery] = useState('')
   const [warn, setWarn] = useState<string | null>(null)
+  const [routeMsg, setRouteMsg] = useState<{ ok: boolean; text: string } | null>(null)
+  const [routing, setRouting] = useState(false)
 
-  useEffect(() => {
+  const load = () =>
     db.locations
       .toArray()
       .then((ls) =>
@@ -39,7 +42,17 @@ export function LocationComparePage() {
             .sort((a, b) => Number(b.isReference) - Number(a.isReference) || a.name.localeCompare(b.name, 'pt-BR')),
         ),
       )
+  useEffect(() => {
+    load()
   }, [])
+
+  const calcRoutes = async () => {
+    setRouting(true)
+    const r = await fillMissingRoutes()
+    setRouting(false)
+    setRouteMsg(r.ok ? { ok: true, text: routesSummary(r.filled, r.failed) } : { ok: false, text: r.reason })
+    await load()
+  }
 
   if (!locations) return <Loading />
 
@@ -76,7 +89,11 @@ export function LocationComparePage() {
       label: 'De carro (sem trânsito, OSRM)',
       best: bestCar,
       cell: (l) =>
-        l.isReference ? '—' : l.carRoute.value ? `${formatKm(l.carRoute.value.km)} · ${Math.round(l.carRoute.value.minutes)} min` : 'Abra a ficha no mapa para calcular',
+        l.isReference ? '—' : l.carRoute.value ? `${formatKm(l.carRoute.value.km)} · ${Math.round(l.carRoute.value.minutes)} min` : (
+            <button type="button" className="btn btn-sm" onClick={calcRoutes} disabled={routing}>
+              {routing ? 'Calculando…' : 'Calcular rotas'}
+            </button>
+          ),
     },
     {
       label: 'Transporte público',
@@ -134,6 +151,11 @@ export function LocationComparePage() {
         <p className="muted">Selecione pelo menos 2 localidades.</p>
       ) : (
         <section className="card">
+          {routeMsg && (
+            <div className={`alert ${routeMsg.ok ? 'alert-success' : 'alert-error'}`} role="status">
+              {routeMsg.text}
+            </div>
+          )}
           <div className="table-wrap">
             <table className="lc-table">
               <thead>

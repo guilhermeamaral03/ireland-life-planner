@@ -116,3 +116,10 @@ export function filterLocations(
       (q === '' || fold(l.name).includes(q)),
   )
 }
+
+/** Mensagem após calcular as rotas em lote. */
+export function routesSummary(filled: number, failed: string[]): string {
+  const ok =
+    filled === 0 ? 'Nenhuma rota nova calculada.' : `${filled} ${filled === 1 ? 'rota calculada' : 'rotas calculadas'} (OSRM, sem trânsito).`
+  return failed.length ? `${ok} Sem rota: ${failed.join(', ')}.` : ok
+}

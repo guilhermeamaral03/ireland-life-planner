@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { INITIAL_LOCATIONS } from '../data/seed/locations'
 import { clearAllData, exportBackup, importBackup } from '../db/backup'
 import { db, DEFAULT_SETTINGS, ensureSeeded, hasUserData } from '../db/db'
-import { filterLocations, isUntouched, newLocation, prepareLocationSave, transitUrl, validateLocationEdit } from './locations'
+import { filterLocations, isUntouched, newLocation, prepareLocationSave, routesSummary, transitUrl, validateLocationEdit } from './locations'
 
 beforeEach(async () => {
   db.close()
@@ -117,5 +117,13 @@ describe('funções de localidade', () => {
     expect(filterLocations(list, { favorites: false, withRent: false, query: 'CÓBH' }).map((l) => l.name)).toEqual(['Cobh'])
     expect(filterLocations(list, { favorites: true, withRent: false, query: '' }).map((l) => l.name)).toEqual(['Midleton'])
     expect(filterLocations(list, { favorites: false, withRent: true, query: '' })).toEqual([])
+  })
+})
+
+describe('routesSummary', () => {
+  it('texto com plural e falhas', () => {
+    expect(routesSummary(1, [])).toBe('1 rota calculada (OSRM, sem trânsito).')
+    expect(routesSummary(30, ['Ilha'])).toBe('30 rotas calculadas (OSRM, sem trânsito). Sem rota: Ilha.')
+    expect(routesSummary(0, [])).toBe('Nenhuma rota nova calculada.')
   })
 })
