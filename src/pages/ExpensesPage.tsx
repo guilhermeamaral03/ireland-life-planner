@@ -7,6 +7,7 @@ import { addCategory, deleteCategory, GROUP_LABELS } from '../db/categories'
 import { db } from '../db/db'
 import type { Category, CategoryGroup, Expense, Frequency } from '../db/types'
 import {
+  missingCommonExpenses,
   summarizeExpenses,
   toMonthly,
   validateExpense,
@@ -92,6 +93,16 @@ export function ExpensesPage() {
     await reload()
   }
 
+  const common = missingCommonExpenses(data.categories, data.expenses)
+  const useCommon = (d: ExpenseDraft) => {
+    setDraft(d)
+    setEditingId(null)
+    setErrors({})
+    setFormKey((k) => k + 1)
+    // o valor é a única coisa que falta: leva o cursor direto para ele
+    setTimeout(() => document.querySelector<HTMLInputElement>('#expense-form input[inputmode]')?.focus(), 0)
+  }
+
   const sorted = [...data.expenses].sort(
     (a, b) => toMonthly(b.amount, b.frequency) - toMonthly(a.amount, a.frequency),
   )
@@ -142,6 +153,18 @@ export function ExpensesPage() {
 
       <section className="card" id="expense-form">
         <h2>{editingId !== null ? 'Editar despesa' : 'Adicionar despesa'}</h2>
+        {editingId === null && common.length > 0 && (
+          <div className="common-expenses">
+            <span className="muted">Despesas comuns que faltam (toque e informe só o valor):</span>
+            <div className="row">
+              {common.map((c) => (
+                <button key={c.name} type="button" className={`btn btn-sm${draft.name === c.name ? ' btn-primary' : ''}`} onClick={() => useCommon(c)}>
+                  + {c.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         <form className="form-grid" onSubmit={submit} noValidate>
           <div className="field">
             <label htmlFor="exp-name">Nome</label>

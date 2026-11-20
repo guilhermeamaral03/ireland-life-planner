@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Category, Expense } from '../db/types'
-import { monthlyRentFromExpenses, projectReserve, summarizeExpenses, toMonthly, validateExpense } from './expenses'
+import { missingCommonExpenses, monthlyRentFromExpenses, projectReserve, summarizeExpenses, toMonthly, validateExpense } from './expenses'
 
 const categories: Category[] = [
   { id: 1, name: 'Aluguel', group: 'moradia', builtIn: true },
@@ -85,5 +85,20 @@ describe('projectReserve', () => {
     expect(p).toHaveLength(25)
     expect(p[0]).toEqual({ month: 0, value: 1000 })
     expect(p[24].value).toBe(13000)
+  })
+})
+
+describe('missingCommonExpenses (despesas comuns em um toque)', () => {
+  it('sugere as comuns cujas categorias ainda não têm despesa, sem valor', () => {
+    const s = missingCommonExpenses(categories, [])
+    expect(s.map((d) => d.name)).toEqual(['Aluguel', 'Mercado'])
+    expect(s.every((d) => d.amount === null)).toBe(true)
+    expect(missingCommonExpenses(categories, expenses)).toEqual([])
+  })
+  it('categoria com despesa ou inexistente não aparece', () => {
+    const s = missingCommonExpenses(categories, [{ id: 9, name: 'x', categoryId: 3, amount: 50, frequency: 'semanal', kind: 'variavel' }])
+    expect(s.map((d) => d.name)).not.toContain('Mercado')
+    expect(s.map((d) => d.name)).not.toContain('Internet') // sem categoria Internet no fixture
+    expect(s.find((d) => d.name === 'Aluguel')).toMatchObject({ categoryId: 1, frequency: 'mensal', kind: 'fixa' })
   })
 })

@@ -15,12 +15,12 @@ Design completo e decisões: `docs/superpowers/specs/2026-11-19-ireland-life-pla
 
 | Menu | O que faz |
 |---|---|
-| **Dashboard** | O único lugar com as contas: salário bruto/líquido, despesas, saldo, economia, reserva, distribuição e projeção. |
+| **Dashboard** | O único lugar com as contas: salário bruto/líquido, despesas, saldo, economia, reserva, distribuição e projeção. **"E se eu alugar um imóvel favorito?"** recalcula líquido e saldo com o aluguel de cada favorito. |
 | **Simulador de renda** | Income Tax, USC, PRSI e Rent Tax Credit (usa o aluguel de Despesas), com detalhamento e fontes. 2026 (oficial) e 2027 (proposto). |
-| **Despesas** | Todos os gastos, inclusive o aluguel (fonte única); frequência semanal, mensal, trimestral ou anual; categorias personalizadas. |
-| **Mapa de Cork** | 31 localidades (OpenStreetMap), ficha editável, distância em linha reta, rota de carro (OSRM) e link de transporte público. |
+| **Despesas** | Todos os gastos, inclusive o aluguel (fonte única); frequência semanal, mensal, trimestral ou anual; categorias personalizadas. Despesas comuns em um toque (você informa só o valor). |
+| **Mapa de Cork** | 31 localidades (OpenStreetMap), ficha editável, distância em linha reta, rota de carro (OSRM, todas de uma vez) e link de transporte público. Ordena por tempo de carro, filtra "até X min" e mostra os imóveis salvos em cada localidade. |
 | **Segurança** | Ocorrências por estação da Garda (CSO, tabela CJA11) e avaliação da **tendência** — não é estatística oficial. |
-| **Comparador de localidades** | Fatos de 2 a 4 localidades: aluguel, distância, tempos, dependência de carro, segurança e notas. |
+| **Comparador de localidades** | Fatos de 2 a 4 localidades: aluguel, distância, tempos, imóveis salvos, dependência de carro, segurança e notas. |
 | **Imóveis** | Anúncios para controle. Colando o link (Daft) ou o texto do anúncio, título, tipo, localidade, aluguel e contas são preenchidos; no Android dá para usar o botão **Compartilhar**. Botão **"Usar este aluguel nas minhas despesas"**. |
 | **Configurações** | Perfil (nome e foto, sem login), backup, importação e apagar dados. |
 

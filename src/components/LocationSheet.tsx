@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Location } from '../db/types'
-import { formatDateTime, formatKm, NOT_AVAILABLE } from '../domain/format'
+import { formatDateTime, formatEUR, formatKm, NOT_AVAILABLE } from '../domain/format'
 import { haversineKm } from '../domain/geo'
 import { prepareLocationSave, transitUrl, validateLocationEdit } from '../domain/locations'
 import { Link } from 'react-router-dom'
@@ -16,6 +16,8 @@ interface Props {
   onDelete(l: Location): Promise<void>
   onRecalc(l: Location): void
   safety: SafetyResult
+  /** Imóveis que você salvou nesta localidade. */
+  saved?: { count: number; avgRent: number | null }
 }
 
 const TEXTS: [keyof Location, string][] = [
@@ -30,8 +32,10 @@ const TEXTS: [keyof Location, string][] = [
 
 const DEP_LABELS = { baixa: 'Baixa', media: 'Média', alta: 'Alta' } as const
 const minutes = (m: number) => `${Math.round(m)} min`
+export const savedText = (s: { count: number; avgRent: number | null } | undefined) =>
+  !s ? 'Nenhum' : `${s.count} ${s.count === 1 ? 'imóvel' : 'imóveis'}${s.avgRent !== null ? ` · média ${formatEUR(s.avgRent)}/mês` : ''}`
 
-export function LocationSheet({ location, reference, routeStatus, onSave, onDelete, onRecalc, safety }: Props) {
+export function LocationSheet({ location, reference, routeStatus, onSave, onDelete, onRecalc, safety, saved: savedHere }: Props) {
   const [d, setD] = useState<Location>(location)
   const [invalid, setInvalid] = useState<Set<string>>(new Set())
   const [error, setError] = useState<string | null>(null)
@@ -150,6 +154,13 @@ export function LocationSheet({ location, reference, routeStatus, onSave, onDele
             ? `€ ${location.rentRange.value.min.toLocaleString('pt-BR')} – € ${location.rentRange.value.max.toLocaleString('pt-BR')}/mês`
             : NOT_AVAILABLE}
           {location.rentRange.source && <span className="fact-note">Fonte: {location.rentRange.source}</span>}
+        </dd>
+        <dt>Imóveis que você salvou aqui</dt>
+        <dd>
+          {savedText(savedHere)}
+          <Link className="btn btn-sm" to="/imoveis">
+            Ver imóveis
+          </Link>
         </dd>
         <dt>Dependência de carro</dt>
         <dd>{location.carDependency.value ? DEP_LABELS[location.carDependency.value] : NOT_AVAILABLE}</dd>

@@ -32,3 +32,4 @@
   .map-layout { grid-template-columns: 1fr; }
   .leaflet-map { height: 55vh; min-height: 320px; }
 }
+.loc-sort { margin-top: var(--space-2); }

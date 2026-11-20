@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { INITIAL_LOCATIONS } from '../data/seed/locations'
 import { clearAllData, exportBackup, importBackup } from '../db/backup'
 import { db, DEFAULT_SETTINGS, ensureSeeded, hasUserData } from '../db/db'
-import { filterLocations, isUntouched, newLocation, prepareLocationSave, routesSummary, transitUrl, validateLocationEdit } from './locations'
+import { filterLocations, isUntouched, newLocation, prepareLocationSave, propertiesByLocation, routesSummary, sortLocations, transitUrl, validateLocationEdit } from './locations'
 
 beforeEach(async () => {
   db.close()
@@ -125,5 +125,32 @@ describe('routesSummary', () => {
     expect(routesSummary(1, [])).toBe('1 rota calculada (OSRM, sem trânsito).')
     expect(routesSummary(30, ['Ilha'])).toBe('30 rotas calculadas (OSRM, sem trânsito). Sem rota: Ilha.')
     expect(routesSummary(0, [])).toBe('Nenhuma rota nova calculada.')
+  })
+})
+
+describe('ordenar por tempo e filtrar por minutos', () => {
+  const route = (m: number | null) => ({ value: m === null ? null : { km: m, minutes: m }, source: null, date: null })
+  const mk = (id: number, name: string, m: number | null, ref = false) => ({ ...newLocation(name, 0, 0), id, isReference: ref, carRoute: route(m) })
+  const list = [mk(1, 'Cork City', null, true), mk(2, 'Bandon', 35), mk(3, 'Cobh', 25), mk(4, 'Zeta', null), mk(5, 'Ana', 25)]
+  it('referência primeiro; depois menor tempo; empate por nome; sem rota no fim', () => {
+    expect(sortLocations(list, 'tempo').map((l) => l.name)).toEqual(['Cork City', 'Ana', 'Cobh', 'Bandon', 'Zeta'])
+    expect(sortLocations(list, 'nome').map((l) => l.name)).toEqual(['Cork City', 'Ana', 'Bandon', 'Cobh', 'Zeta'])
+  })
+  it('até X minutos: referência fica, sem rota sai', () => {
+    expect(filterLocations(list, { favorites: false, withRent: false, query: '', maxMinutes: 30 }).map((l) => l.name)).toEqual(['Cork City', 'Cobh', 'Ana'])
+    expect(filterLocations(list, { favorites: false, withRent: false, query: '', maxMinutes: null })).toHaveLength(5)
+  })
+})
+
+describe('propertiesByLocation (imóveis salvos na localidade)', () => {
+  const p = (locationId: number | null, rent: number) => ({ locationId, rent })
+  it('conta e faz a média só dos aluguéis informados', () => {
+    const r = propertiesByLocation([p(1, 1000), p(1, 0), p(1, 1200), p(2, 800), p(null, 500)])
+    expect(r.get(1)).toEqual({ count: 3, avgRent: 1100 })
+    expect(r.get(2)).toEqual({ count: 1, avgRent: 800 })
+    expect(r.get(3)).toBeUndefined()
+  })
+  it('sem aluguel informado → média null', () => {
+    expect(propertiesByLocation([p(1, 0)]).get(1)).toEqual({ count: 1, avgRent: null })
   })
 })

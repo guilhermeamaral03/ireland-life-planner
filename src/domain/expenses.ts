@@ -86,3 +86,23 @@ export function validateExpense(d: ExpenseDraft): ExpenseErrors {
 export function projectReserve(initial: number, monthlySaving: number, months: number) {
   return Array.from({ length: months + 1 }, (_, month) => ({ month, value: initial + monthlySaving * month }))
 }
+
+/** Despesas comuns para adicionar em um toque (o valor é sempre você quem informa). */
+const COMMON_EXPENSES: { name: string; frequency: Frequency; kind: Expense['kind'] }[] = [
+  { name: 'Aluguel', frequency: 'mensal', kind: 'fixa' },
+  { name: 'Eletricidade', frequency: 'mensal', kind: 'variavel' },
+  { name: 'Gás', frequency: 'mensal', kind: 'variavel' },
+  { name: 'Internet', frequency: 'mensal', kind: 'fixa' },
+  { name: 'Celular', frequency: 'mensal', kind: 'fixa' },
+  { name: 'Mercado', frequency: 'semanal', kind: 'variavel' },
+  { name: 'Transporte público', frequency: 'mensal', kind: 'variavel' },
+]
+
+/** Comuns cuja categoria existe e ainda não tem nenhuma despesa — prontas para o formulário. */
+export function missingCommonExpenses(categories: Category[], expenses: Expense[]): ExpenseDraft[] {
+  const used = new Set(expenses.map((e) => e.categoryId))
+  return COMMON_EXPENSES.flatMap((c) => {
+    const cat = categories.find((x) => x.name === c.name)
+    return cat?.id !== undefined && !used.has(cat.id) ? [{ ...c, categoryId: cat.id, amount: null }] : []
+  })
+}

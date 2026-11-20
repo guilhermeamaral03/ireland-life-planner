@@ -2,12 +2,21 @@ import { Loading } from '../components/Loading'
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { CircleMarker, MapContainer, TileLayer, Tooltip, useMap, useMapEvents } from 'react-leaflet'
 import { useSafety } from '../app/useSafety'
-import { LocationSheet } from '../components/LocationSheet'
+import { LocationSheet, savedText } from '../components/LocationSheet'
 import { db } from '../db/db'
 import type { Location } from '../db/types'
 import { formatKm } from '../domain/format'
 import { haversineKm } from '../domain/geo'
-import { filterLocations, newLocation, normalizeLocation, routesSummary } from '../domain/locations'
+import {
+  filterLocations,
+  newLocation,
+  normalizeLocation,
+  propertiesByLocation,
+  routesSummary,
+  sortLocations,
+  type LocationSort,
+} from '../domain/locations'
+import type { Property } from '../db/types'
 import { fetchCarRoute, routeToSourced } from '../services/osrm'
 import { fillMissingRoutes } from '../db/routes'
 import './MapPage.css'
@@ -18,7 +27,9 @@ const CORK: [number, number] = [51.9, -8.47]
 export function MapPage() {
   const [locations, setLocations] = useState<Location[] | null>(null)
   const [selectedId, setSelectedId] = useState<number | null>(null)
-  const [filters, setFilters] = useState({ favorites: false, withRent: false, query: '' })
+  const [filters, setFilters] = useState({ favorites: false, withRent: false, query: '', maxMinutes: null as number | null })
+  const [sortBy, setSortBy] = useState<LocationSort>('nome')
+  const [properties, setProperties] = useState<Property[]>([])
   const [withSafety, setWithSafety] = useState(false)
   const safety = useSafety()
   const [adding, setAdding] = useState(false)
@@ -32,6 +43,10 @@ export function MapPage() {
 
   const load = useCallback(async () => setLocations((await db.locations.orderBy('id').toArray()).map(normalizeLocation)), [])
   useEffect(() => {
+    db.properties.toArray().then(setProperties).catch(() => setProperties([]))
+  }, [])
+  const savedByLoc = useMemo(() => propertiesByLocation(properties), [properties])
+  useEffect(() => {
     load()
   }, [load])
 
@@ -43,13 +58,12 @@ export function MapPage() {
   const visible = useMemo(
     () =>
       locations
-        ? filterLocations(locations, filters)
-            .filter((l) => !withSafety || safety.classify(l).level !== 'insuficiente')
-            .sort(
-            (a, b) => Number(b.isReference) - Number(a.isReference) || a.name.localeCompare(b.name, 'pt-BR'),
+        ? sortLocations(
+            filterLocations(locations, filters).filter((l) => !withSafety || safety.classify(l).level !== 'insuficiente'),
+            sortBy,
           )
         : [],
-    [locations, filters, withSafety, safety],
+    [locations, filters, withSafety, safety, sortBy],
   )
 
   const latestRouteReq = useRef(new Map<number, number>())
@@ -238,6 +252,34 @@ export function MapPage() {
                 Com dados de segurança
               </label>
             </div>
+            <div className="form-grid loc-sort">
+              <div className="field">
+                <label htmlFor="loc-max">De carro até Cork City</label>
+                <select
+                  id="loc-max"
+                  className="input"
+                  value={filters.maxMinutes ?? ''}
+                  onChange={(e) => setFilters({ ...filters, maxMinutes: e.target.value === '' ? null : Number(e.target.value) })}
+                >
+                  <option value="">Qualquer tempo</option>
+                  {[15, 20, 30, 45, 60].map((m) => (
+                    <option key={m} value={m}>
+                      Até {m} min
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="field">
+                <label htmlFor="loc-sort">Ordenar por</label>
+                <select id="loc-sort" className="input" value={sortBy} onChange={(e) => setSortBy(e.target.value as LocationSort)}>
+                  <option value="nome">Nome</option>
+                  <option value="tempo">Tempo de carro</option>
+                </select>
+              </div>
+            </div>
+            {filters.maxMinutes !== null && missingRoutes > 0 && (
+              <p className="field-hint">{missingRoutes} sem rota calculada ficam de fora — use o botão acima do mapa.</p>
+            )}
             {visible.length === 0 ? (
               <p className="muted">Nenhuma localidade com esses filtros.</p>
             ) : (
@@ -250,7 +292,14 @@ export function MapPage() {
                         {l.name}
                       </span>
                       <span className="muted">
-                        {l.isReference ? 'referência' : reference ? `${formatKm(haversineKm(l, reference))} em linha reta` : ''}
+                        {l.isReference
+                          ? 'referência'
+                          : l.carRoute.value
+                            ? `${Math.round(l.carRoute.value.minutes)} min de carro`
+                            : reference
+                              ? `${formatKm(haversineKm(l, reference))} em linha reta`
+                              : ''}
+                        {savedByLoc.has(l.id!) ? ` · ${savedText(savedByLoc.get(l.id!)).split(' · ')[0]}` : ''}
                       </span>
                     </button>
                   </li>
@@ -268,6 +317,7 @@ export function MapPage() {
               onDelete={remove}
               onRecalc={recalc}
               safety={safety.classify(selected)}
+              saved={savedByLoc.get(selected.id!)}
             />
           ) : (
             <section className="card">

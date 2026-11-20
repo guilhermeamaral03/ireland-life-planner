@@ -106,12 +106,14 @@ const fold = (s: string) =>
 
 export function filterLocations(
   list: Location[],
-  f: { favorites: boolean; withRent: boolean; query: string },
+  f: { favorites: boolean; withRent: boolean; query: string; maxMinutes?: number | null },
 ): Location[] {
   const q = fold(f.query)
+  const max = f.maxMinutes ?? null
   return list.filter(
     (l) =>
       (!f.favorites || l.favorite) &&
+      (max === null || l.isReference || (l.carRoute?.value != null && l.carRoute.value.minutes <= max)) &&
       (!f.withRent || l.rentRange?.value != null) &&
       (q === '' || fold(l.name).includes(q)),
   )
@@ -122,4 +124,35 @@ export function routesSummary(filled: number, failed: string[]): string {
   const ok =
     filled === 0 ? 'Nenhuma rota nova calculada.' : `${filled} ${filled === 1 ? 'rota calculada' : 'rotas calculadas'} (OSRM, sem trânsito).`
   return failed.length ? `${ok} Sem rota: ${failed.join(', ')}.` : ok
+}
+
+export type LocationSort = 'nome' | 'tempo'
+
+/** Referência primeiro; por nome, ou pelo tempo de carro até Cork City (sem rota vai para o fim). */
+export function sortLocations(list: Location[], by: LocationSort): Location[] {
+  const minutes = (l: Location) => l.carRoute?.value?.minutes ?? Infinity
+  return [...list].sort(
+    (a, b) =>
+      Number(b.isReference) - Number(a.isReference) ||
+      (by === 'tempo' ? minutes(a) - minutes(b) : 0) ||
+      a.name.localeCompare(b.name, 'pt-BR'),
+  )
+}
+
+/** Imóveis salvos por localidade: quantidade e média dos aluguéis informados. */
+export function propertiesByLocation(
+  properties: { locationId: number | null; rent: number }[],
+): Map<number, { count: number; avgRent: number | null }> {
+  const acc = new Map<number, { count: number; sum: number; n: number }>()
+  for (const p of properties) {
+    if (p.locationId === null) continue
+    const a = acc.get(p.locationId) ?? { count: 0, sum: 0, n: 0 }
+    a.count++
+    if (p.rent > 0) {
+      a.sum += p.rent
+      a.n++
+    }
+    acc.set(p.locationId, a)
+  }
+  return new Map([...acc].map(([id, a]) => [id, { count: a.count, avgRent: a.n ? a.sum / a.n : null }]))
 }

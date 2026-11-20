@@ -1,6 +1,6 @@
 import { getTaxRules } from '../data/tax'
 import type { Category, Expense, Settings, TaxStatus } from '../db/types'
-import { monthlyRentFromExpenses } from './expenses'
+import { monthlyRentFromExpenses, summarizeExpenses } from './expenses'
 import { calcNetPay, type TaxResult, type TaxUnavailable } from './tax'
 
 export const DEFAULT_TAX_YEAR = 2027
@@ -45,4 +45,30 @@ export function computeTax(
     },
     rules,
   )
+}
+
+export type WithRentResult =
+  | { ok: true; netMonthly: number; expensesMonthly: number; balance: number }
+  | { ok: false; reason: string }
+
+/**
+ * "E se eu alugar este imóvel?": troca o aluguel cadastrado em Despesas por `rentMonthly`
+ * e recalcula o líquido (o Rent Tax Credit muda) e o saldo. Nada é gravado.
+ */
+export function withRent(
+  settings: Settings,
+  expenses: Expense[],
+  categories: Category[],
+  rentMonthly: number,
+): WithRentResult | null {
+  const rentIds = new Set(categories.filter((c) => c.name === 'Aluguel').map((c) => c.id))
+  const rentCat = categories.find((c) => c.name === 'Aluguel')
+  if (rentCat?.id === undefined) return { ok: false, reason: 'Categoria Aluguel não encontrada.' }
+  const others = expenses.filter((e) => !rentIds.has(e.categoryId))
+  const simulated: Expense[] = [...others, { name: 'Aluguel', categoryId: rentCat.id, amount: rentMonthly, frequency: 'mensal', kind: 'fixa' }]
+  const tax = computeTax(settings, simulated, categories)
+  if (tax === null) return null
+  if (!tax.ok) return tax
+  const expensesMonthly = summarizeExpenses(simulated, categories, tax.netMonthly).totalMonthly
+  return { ok: true, netMonthly: tax.netMonthly, expensesMonthly, balance: tax.netMonthly - expensesMonthly }
 }

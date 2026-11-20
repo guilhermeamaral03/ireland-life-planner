@@ -11,3 +11,7 @@
 @media (max-width: 600px) {
   .dash-charts { grid-template-columns: 1fr; }
 }
+.whatif-table { width: 100%; border-collapse: collapse; }
+.whatif-table th, .whatif-table td { padding: var(--space-2); border-bottom: 1px solid var(--border); text-align: left; }
+.whatif-table .num { text-align: right; white-space: nowrap; }
+.whatif-table .negative { color: var(--danger, #b3261e); }

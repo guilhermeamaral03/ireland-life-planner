@@ -8,7 +8,8 @@ import type { Location } from '../db/types'
 import { bestBy, toggleCompare } from '../domain/compare'
 import { formatEUR, formatKm, NOT_AVAILABLE } from '../domain/format'
 import { haversineKm } from '../domain/geo'
-import { normalizeLocation, routesSummary } from '../domain/locations'
+import { normalizeLocation, propertiesByLocation, routesSummary, sortLocations, type LocationSort } from '../domain/locations'
+import { savedText } from '../components/LocationSheet'
 import { fillMissingRoutes } from '../db/routes'
 import './LocationComparePage.css'
 
@@ -31,19 +32,21 @@ export function LocationComparePage() {
   const [warn, setWarn] = useState<string | null>(null)
   const [routeMsg, setRouteMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const [routing, setRouting] = useState(false)
+  const [sortBy, setSortBy] = useState<LocationSort>('nome')
+  const [saved, setSaved] = useState<ReturnType<typeof propertiesByLocation>>(new Map())
 
   const load = () =>
     db.locations
       .toArray()
       .then((ls) =>
-        setLocations(
-          ls
-            .map(normalizeLocation)
-            .sort((a, b) => Number(b.isReference) - Number(a.isReference) || a.name.localeCompare(b.name, 'pt-BR')),
-        ),
+        setLocations(ls.map(normalizeLocation)),
       )
   useEffect(() => {
     load()
+    db.properties
+      .toArray()
+      .then((ps) => setSaved(propertiesByLocation(ps)))
+      .catch(() => setSaved(new Map()))
   }, [])
 
   const calcRoutes = async () => {
@@ -59,7 +62,7 @@ export function LocationComparePage() {
   const reference = locations.find((l) => l.isReference)
   const chosen = selected.map((id) => locations.find((l) => l.id === id)!).filter(Boolean)
   const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
-  const list = locations.filter((l) => fold(l.name).includes(fold(query.trim())))
+  const list = sortLocations(locations, sortBy).filter((l) => fold(l.name).includes(fold(query.trim())))
 
   const pick = (id: number) => {
     const r = toggleCompare(selected, id)
@@ -94,6 +97,10 @@ export function LocationComparePage() {
               {routing ? 'Calculando…' : 'Calcular rotas'}
             </button>
           ),
+    },
+    {
+      label: 'Imóveis que você salvou',
+      cell: (l) => savedText(saved.get(l.id!)),
     },
     {
       label: 'Transporte público',
@@ -133,6 +140,13 @@ export function LocationComparePage() {
           <label htmlFor="lc-search">Escolha as localidades</label>
           <input id="lc-search" className="input" placeholder="Buscar" value={query} onChange={(e) => setQuery(e.target.value)} />
         </div>
+        <div className="field">
+          <label htmlFor="lc-sort">Ordenar por</label>
+          <select id="lc-sort" className="input" value={sortBy} onChange={(e) => setSortBy(e.target.value as LocationSort)}>
+            <option value="nome">Nome</option>
+            <option value="tempo">Tempo de carro até Cork City</option>
+          </select>
+        </div>
         {warn && <div className="alert alert-warning">{warn}</div>}
         <ul className="lc-pick">
           {list.map((l) => (
@@ -140,6 +154,7 @@ export function LocationComparePage() {
               <label className="check">
                 <input type="checkbox" checked={selected.includes(l.id!)} onChange={() => pick(l.id!)} />
                 {l.name}
+                {!l.isReference && l.carRoute.value && <span className="muted"> · {Math.round(l.carRoute.value.minutes)} min</span>}
                 {l.rentRange.value ? '' : <span className="muted"> · sem aluguel</span>}
               </label>
             </li>

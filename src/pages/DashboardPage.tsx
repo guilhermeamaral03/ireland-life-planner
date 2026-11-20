@@ -1,6 +1,6 @@
 import { firstName } from '../domain/image'
 import { Loading } from '../components/Loading'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Area,
@@ -18,7 +18,9 @@ import { useFinanceData } from '../app/useFinanceData'
 import { useProfile } from '../app/useProfile'
 import { getTaxRules } from '../data/tax'
 import { buildDashboard } from '../domain/dashboard'
-import { effectiveYear, ESTIMATE_DISCLAIMER, RULES_STATUS_LABELS } from '../domain/finance'
+import { effectiveYear, ESTIMATE_DISCLAIMER, RULES_STATUS_LABELS, withRent } from '../domain/finance'
+import { db } from '../db/db'
+import type { Property } from '../db/types'
 import { formatEUR, formatPercent } from '../domain/format'
 import './DashboardPage.css'
 
@@ -39,6 +41,14 @@ export function DashboardPage() {
   const profile = useProfile()
   const first = firstName(profile.name)
   const d = useMemo(() => (data ? buildDashboard(data.settings, data.expenses, data.categories) : null), [data])
+  const [favorites, setFavorites] = useState<Property[]>([])
+  useEffect(() => {
+    db.properties
+      .filter((p) => p.favorite && p.rent > 0)
+      .toArray()
+      .then(setFavorites)
+      .catch(() => setFavorites([]))
+  }, [])
 
   if (error) return <div className="page"><div className="alert alert-error">{error}</div></div>
   if (!data || !d) return <Loading />
@@ -115,6 +125,55 @@ export function DashboardPage() {
           <div className="kpi-value">{d.reserve === null ? 'Não informada' : formatEUR(d.reserve)}</div>
         </div>
       </div>
+
+      {tax.ok && favorites.length > 0 && (
+        <section className="card">
+          <h2>E se eu alugar um imóvel favorito?</h2>
+          <p className="muted chart-sub">
+            Troca o aluguel das suas despesas pelo do imóvel e recalcula o líquido (Rent Tax Credit) e o saldo. Nada é
+            alterado nas suas despesas.
+          </p>
+          <div className="table-wrap">
+            <table className="whatif-table">
+              <thead>
+                <tr>
+                  <th>Imóvel</th>
+                  <th className="num">Aluguel</th>
+                  <th className="num">Saldo mensal</th>
+                  <th className="num">Diferença</th>
+                </tr>
+              </thead>
+              <tbody>
+                {favorites.map((p) => {
+                  const r = withRent(data.settings, data.expenses, data.categories, p.rent)
+                  const diff = r?.ok && summary.balance !== null ? r.balance - summary.balance : null
+                  return (
+                    <tr key={p.id}>
+                      <td>
+                        {p.title || 'Sem título'}
+                        {p.billsIncluded && <span className="muted"> · contas incluídas</span>}
+                      </td>
+                      <td className="num">{formatEUR(p.rent)}</td>
+                      <td className={`num${r?.ok && r.balance < 0 ? ' negative' : ''}`}>
+                        {r?.ok ? formatEUR(r.balance) : 'Não disponível'}
+                      </td>
+                      <td className="num">
+                        {diff === null ? '—' : `${diff >= 0 ? '+' : '−'}${formatEUR(Math.abs(diff))}`}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+          {favorites.some((p) => p.billsIncluded) && (
+            <p className="disclaimer">
+              Contas incluídas: luz, gás e internet que você cadastrou em Despesas continuam somadas — o saldo real pode
+              ser maior.
+            </p>
+          )}
+        </section>
+      )}
 
       <div className="dash-charts">
         <section className="card">
